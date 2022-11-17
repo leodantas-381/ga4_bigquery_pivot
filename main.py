@@ -56,8 +56,6 @@ def input_to_query(params):
 
 event_params_field = input_to_schema_fields(event_params_input)
 event_params_query = input_to_query(event_params_input)
-
-event_params_to_pivot = list(event_params_input.keys())
     
 
 sql_query_drop_pivoted_table = '''
