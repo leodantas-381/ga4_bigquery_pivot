@@ -12,7 +12,6 @@ def pivot_table(body, event):
     PROJECT_ID = pubsub_message_json['PROJECT_ID']
     DATASET_ID = pubsub_message_json['DATASET_ID']
     event_params_input = pubsub_message_json['event_params']
-    print(event_params_input)
     project_dataset_id = PROJECT_ID + '.' + DATASET_ID + '.'
     client = bigquery.Client(project=PROJECT_ID)
     yyyymmdd = (datetime.today() - timedelta(days=1)).strftime('%Y%m%d') 
