@@ -18,6 +18,9 @@ Body message (Template example):
     "page_location": {"type": "string", "description": "URL of the page"},
     "page_title": {"type": "string", "description": "Title of the page"},
     "ga_session_id": {"type": "integer", "description": "Session ID"}
+  },
+  "user_properties": {
+    "source": {"type": "string", "description": "User Source"}
   }
 }
 ```

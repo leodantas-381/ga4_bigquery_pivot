@@ -12,6 +12,8 @@ def pivot_table(body, event):
     PROJECT_ID = pubsub_message_json['PROJECT_ID']
     DATASET_ID = pubsub_message_json['DATASET_ID']
     event_params_input = pubsub_message_json['event_params']
+    user_properties_input = pubsub_message_json['user_properties'] 
+
     project_dataset_id = PROJECT_ID + '.' + DATASET_ID + '.'
     client = bigquery.Client(project=PROJECT_ID)
     yyyymmdd = (datetime.today() - timedelta(days=1)).strftime('%Y%m%d') 
@@ -20,11 +22,13 @@ def pivot_table(body, event):
     
     raw_events_table_id = project_dataset_id + 'events_'+ yyyymmdd
     pivoted_events_table_id = project_dataset_id + 'pivoted_events_' + yyyymmdd
-    
-    event_params_field = input_to_schema_fields(event_params_input)
-    event_params_query = input_to_query(event_params_input)
 
-    sqls =   get_sql(raw_events_table_id, pivoted_events_table_id, event_params_field, event_params_query)  
+    event_params_field = input_to_schema_fields(event_params_input)
+    event_params_query = input_to_query(event_params_input, "event_params")
+    user_properties_field = input_to_schema_fields(user_properties_input)
+    user_properties_query = input_to_query(user_properties_input, "user_properties")
+
+    sqls =   get_sql(raw_events_table_id, pivoted_events_table_id, event_params_field, event_params_query, user_properties_field, user_properties_query)  
     print(sqls[0])
     print(sqls[1])
     print(sqls[2])
@@ -48,18 +52,18 @@ def input_to_schema_fields(params):
     output = output + field_name + " " + field_type + options + field_description + '"),'
   return output[:-1]
 
-def input_to_query(params):
+def input_to_query(params, type_params):
   output = ''
   for i in params:
     field_name = i
     field_type = params[i]['type'].lower()
     if field_type == 'integer':
       field_type='int'
-    filler = ["(SELECT value.","_value FROM UNNEST(event_params) WHERE key = '", "') AS ", ","]
+    filler = ["(SELECT value.","_value FROM UNNEST(" + type_params + ") WHERE key = '", "') AS ", ","]
     output = output + filler[0] + field_type + filler[1] + field_name + filler[2] + field_name + filler[3]
   return output[:-1]
   
-def get_sql(raw_events_table_id, pivoted_events_table_id, event_params_field, event_params_query):
+def get_sql(raw_events_table_id, pivoted_events_table_id, event_params_field, event_params_query, user_properties_field, user_properties_query):
   sql_queries = []
   
   sql_queries.append('''DROP TABLE `'''+ pivoted_events_table_id + '''`''')
@@ -78,7 +82,7 @@ def get_sql(raw_events_table_id, pivoted_events_table_id, event_params_field, ev
       privacy_info__analytics_storage STRING OPTIONS(description=""),
       privacy_info__ads_storage STRING OPTIONS(description=""),
       privacy_info__uses_transient_token STRING OPTIONS(description=""),
-
+      ''' + user_properties_field + ''',
       user_first_touch_timestamp INT64 OPTIONS(description=""),
       user_ltv__revenue FLOAT64 OPTIONS(description=""),
       user_ltv__currency STRING OPTIONS(description=""),
@@ -143,7 +147,7 @@ def get_sql(raw_events_table_id, pivoted_events_table_id, event_params_field, ev
       privacy_info.analytics_storage,
       privacy_info.ads_storage,
       privacy_info.uses_transient_token,
-
+      ''' + user_properties_query + ''',
       user_first_touch_timestamp,
       user_ltv.revenue,
       user_ltv.currency,
