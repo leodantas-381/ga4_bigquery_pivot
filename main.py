@@ -15,12 +15,12 @@ def pivot_table(body, event):
     print(event_params_input)
     project_dataset_id = PROJECT_ID + '.' + DATASET_ID + '.'
     client = bigquery.Client(project=PROJECT_ID)
-    yesterday_yyyymmdd = (datetime.today() - timedelta(days=1)).strftime('%Y%m%d')
-    # MOCKED DATE
-    # yesterday_yyyymmdd = '20221110'
+    yyyymmdd = (datetime.today() - timedelta(days=1)).strftime('%Y%m%d') 
+    if pubsub_message_json['yyyymmdd']:
+      yyyymmdd = pubsub_message_json['yyyymmdd']
     
-    raw_events_table_id = project_dataset_id + 'events_'+ yesterday_yyyymmdd
-    pivoted_events_table_id = project_dataset_id + 'pivoted_events_' + yesterday_yyyymmdd
+    raw_events_table_id = project_dataset_id + 'events_'+ yyyymmdd
+    pivoted_events_table_id = project_dataset_id + 'pivoted_events_' + yyyymmdd
     print(raw_events_table_id)
     event_params_field = input_to_schema_fields(event_params_input)
     event_params_query = input_to_query(event_params_input)
