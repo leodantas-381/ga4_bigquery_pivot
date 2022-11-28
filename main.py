@@ -20,7 +20,7 @@ def pivot_table(body, event):
     
     raw_events_table_id = project_dataset_id + 'events_'+ yyyymmdd
     pivoted_events_table_id = project_dataset_id + 'pivoted_events_' + yyyymmdd
-    print(raw_events_table_id)
+    
     event_params_field = input_to_schema_fields(event_params_input)
     event_params_query = input_to_query(event_params_input)
 
