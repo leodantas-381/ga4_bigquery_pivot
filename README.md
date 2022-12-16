@@ -14,6 +14,7 @@ Body message (Template example):
 {
   "PROJECT_ID": "your-project-id",
   "DATASET_ID": "your-dataset-id",
+  "intraday": 1,
   "event_params": {
     "page_location": {"type": "string", "description": "URL of the page"},
     "page_title": {"type": "string", "description": "Title of the page"},
